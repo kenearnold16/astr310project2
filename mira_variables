@@ -1,0 +1,61 @@
+%% Project 2 analysis
+
+%% importing table
+T = readtable('project2_data.xlsx');
+
+%% creating array of individual star names
+Star_name = T(1:18,1:1);
+Star_name = join(erase(string(T{1:18, 1:1}), "'"), '', 2);
+
+%% importing g max filter and error array
+G_max = T(1:18,4:4);
+G_max = table2array(G_max);
+sigma_Gmax = T(1:18,5:5);
+sigma_Gmax = table2array(sigma_Gmax);
+
+%% importing g min filter and error
+G_min = T(1:18,6:6);
+G_min = table2array(G_min);
+sigma_Gmin = T(1:18,7:7);
+sigma_Gmin = table2array(sigma_Gmin);
+
+%% importing r max filter and error
+R_max = T(1:18,8:8);
+R_max = table2array(R_max);
+sigma_Rmax = T(1:18,9:9);
+sigma_Rmax = table2array(sigma_Rmax);
+
+%% importing r min filter and error
+R_min = T(1:18,10:10);
+R_min = table2array(R_min);
+sigma_Rmin= T(1:18,11:11);
+sigma_Rmin = table2array(sigma_Rmin);
+
+%% G - R array and error
+G_R_max = G_max - R_max;
+G_R_min = G_min - R_min;
+
+sigma_R_Gmax = sqrt(((sigma_Rmax).^2) + ((sigma_Gmax).^2));
+sigma_R_Gmin = sqrt(((sigma_Rmin).^2) + ((sigma_Gmin).^2));
+
+T1 = table(sigma_R_Gmax, sigma_R_Gmin,'VariableNames', {'sigma max','sigma min'});
+filename = 'error.xlsx';
+writetable(T1,filename,'Sheet',1,'Range','A1');
+
+
+%% plotting star name and G - R max vs G - R min
+figure(2);
+x = (linspace(1,18,18))';
+p3 = errorbar(G_R_max,x,sigma_R_Gmax,'horizontal','bo');
+hold on;
+p4 = errorbar(G_R_min, x, sigma_R_Gmax,'horizontal','ro');
+grid on;
+set(gca,'ytick',[1:18],'yticklabel',Star_name);
+ytickangle(0);
+xlabel('g''-r''');
+title('g'' - r'' for each Star');
+
+ylim([0 19]);
+xlim([-1 7])
+legend([p3 p4] , {'(g''-r'')_m_a_x' , '(g''-r'')_m_i_n'}, 'location', ' Northwest');
+
